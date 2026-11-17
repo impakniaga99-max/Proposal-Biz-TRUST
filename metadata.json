@@ -1,0 +1,6 @@
+{
+  "name": "Program BIZ TRUST — Proposal Digital",
+  "description": "Proposal digital dwibahasa (Bahasa Melayu & English) bagi Program BIZ TRUST: Strategi Penskalaan Perniagaan Berimpak Tinggi untuk 30 PMKS.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="ms" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buku Laporan Bergambar: Program Biz Trust</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bookCover: '#1e293b',
+                        bookAccent: '#0d9488',
+                        paperBg: '#fdfbf7',
+                        paperBorder: '#e2d9c5',
+                    },
+                    fontFamily: {
+                        serif: ['Merriweather', 'serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; }
+        .book-page {
+            background-color: #fdfbf7;
+            background-image: radial-gradient(#e2d9c5 0.75px, transparent 0.75px);
+            background-size: 24px 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 0 40px rgba(0,0,0,0.03);
+        }
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; }
+            .book-page { box-shadow: none !important; margin: 0 !important; width: 100% !important; }
+            .sidebar-toc { display: none !important; }
+        }
+        /* Custom scrollbar for desktop sidebar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #0d9488; border-radius: 3px; }
+    </style>
+</head>
+<body class="antialiased min-h-screen py-4 sm:py-8 px-2 sm:px-6">
+
+<!-- Custom Modal (No alert() used) -->
+    <div id="customModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 hidden no-print px-4">
+        <div class="bg-[#fdfbf7] border-2 border-[#e2d9c5] rounded-2xl p-6 max-w-md w-full shadow-2xl transform transition-all scale-95 opacity-0" id="modalContainer">
+            <div class="flex items-center space-x-3 text-teal-700 mb-4 border-b border-[#e2d9c5] pb-3">
+                <div class="w-10 h-10 rounded-full bg-teal-50 flex items-center justify-center text-lg font-bold">
+                    <i class="fa-solid fa-book-open"></i>
+                </div>
+                <h3 id="modalTitle" class="text-lg font-serif font-bold text-slate-900">Nota Buku Laporan</h3>
+            </div>
+            <p id="modalMessage" class="text-slate-700 text-sm leading-relaxed mb-6 font-serif">Penerangan akan dipaparkan di sini.</p>
+            <div class="flex justify-end">
+                <button onclick="closeModal()" class="px-5 py-2.5 bg-teal-800 text-white font-medium rounded-xl hover:bg-teal-900 transition shadow text-xs uppercase tracking-wider">Tutup Halaman</button>
+            </div>
+        </div>
+    </div>
+
+<!-- TOP CONTROLLER BAR (No-Print) -->
+    <header class="max-w-6xl mx-auto mb-6 flex flex-wrap items-center justify-between gap-4 bg-slate-800/90 backdrop-blur border border-slate-700 px-4 sm:px-6 py-4 rounded-2xl text-white no-print shadow-xl">
+        <div class="flex items-center space-x-3">
+            <div class="w-9 h-9 rounded-xl bg-teal-600 flex items-center justify-center font-bold text-white shadow">
+                <i class="fa-solid fa-book"></i>
+            </div>
+            <div>
+                <h1 class="text-xs sm:text-sm font-bold tracking-wide">BUKU LAPORAN BERGAMBAR: PROGRAM BIZ TRUST</h1>
+                <p class="text-[10px] sm:text-[11px] text-slate-400">Edisi Kertas Kerja Rasmi</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2">
+            <button onclick="toggleSidebar()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 shadow lg:hidden">
+                <i class="fa-solid fa-list"></i> Indeks Bab
+            </button>
+            <button onclick="window.print()" class="px-4 py-1.5 bg-teal-600 hover:bg-teal-500 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 shadow">
+                <i class="fa-solid fa-print"></i> Cetak Buku
+            </button>
+        </div>
+    </header>
+
+<!-- MOBILE SIDEBAR DRAWER -->
+    <div id="sidebarDrawer" class="fixed inset-0 z-40 bg-black/70 hidden lg:hidden no-print flex justify-start">
+        <div class="bg-slate-900 w-72 h-full p-6 text-white overflow-y-auto space-y-6 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                <h3 class="font-bold text-sm text-teal-400"><i class="fa-solid fa-bookmark mr-2"></i> Kandungan Buku</h3>
+                <button onclick="toggleSidebar()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <nav class="space-y-2 text-xs font-medium">
+                <a href="#section-cover" onclick="toggleSidebar()" class="block p-2.5 rounded-lg hover:bg-slate-800 text-slate-300">Kulit & Pengenalan Utama</a>
+                <a href="#section-bab1" onclick="toggleSidebar()" class="block p-2.5 rounded-lg hover:bg-slate-800 text-slate-300">01. Pengenalan & Latar Belakang</a>
+                <a href="#section-mofass" onclick="toggleSidebar()" class="block p-2.5 rounded-lg hover:bg-slate-800 text-slate-300">02. Kerangka M.O.F.A.S.S</a>
+                <a href="#section-bab2" onclick="toggleSidebar()" class="block p-2.5 rounded-lg hover:bg-slate-800 text-slate-300">03. Rangka, Modul & Coaching</a>
+                <a href="#section-kpi" onclick="toggleSidebar()" class="block p-2.5 rounded-lg hover:bg-slate-800 text-slate-300">10.0 Penilaian KRA & KPI</a>
+                <a href="#section-laporan" onclick="toggleSidebar()" class="block p-2.5 rounded-lg hover:bg-slate-800 text-slate-300">11.0 & 12.0 Pemantauan & Laporan</a>
+                <a href="#section-gets" onclick="toggleSidebar()" class="block p-2.5 rounded-lg hover:bg-slate-800 text-slate-300">04. Impak G.E.T.S & Belanjawan</a>
+            </nav>
+        </div>
+    </div>
+
+<!-- MAIN LAYOUT WRAPPER (Desktop Sidebar + Book Container) -->
+    <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+<!-- DESKTOP STICKY SIDEBAR NAVIGATION -->
+        <aside class="hidden lg:block lg:col-span-3 sticky top-6 bg-slate-900 border border-slate-800 rounded-2xl p-5 text-white shadow-xl no-print sidebar-toc space-y-4">
+            <div class="flex items-center space-x-2 border-b border-slate-800 pb-3">
+                <i class="fa-solid fa-bookmark text-teal-400"></i>
+                <h3 class="font-bold text-xs uppercase tracking-wider text-slate-200">Indeks Bab Buku</h3>
+            </div>
+            <nav class="space-y-1.5 text-xs font-medium">
+                <a href="#section-cover" class="block px-3 py-2 rounded-xl hover:bg-slate-800 text-slate-300 transition flex items-center justify-between group">
+                    <span>Kulit Hadapan</span> <i class="fa-solid fa-chevron-right text-[10px] text-slate-500 group-hover:text-teal-400"></i>
+                </a>
+                <a href="#section-bab1" class="block px-3 py-2 rounded-xl hover:bg-slate-800 text-slate-300 transition flex items-center justify-between group">
+                    <span>01. Pengenalan & Latar Belakang</span> <i class="fa-solid fa-chevron-right text-[10px] text-slate-500 group-hover:text-teal-400"></i>
+                </a>
+                <a href="#section-mofass" class="block px-3 py-2 rounded-xl hover:bg-slate-800 text-slate-300 transition flex items-center justify-between group">
+                    <span>02. Kerangka M.O.F.A.S.S</span> <i class="fa-solid fa-chevron-right text-[10px] text-slate-500 group-hover:text-teal-400"></i>
+                </a>
+                <a href="#section-bab2" class="block px-3 py-2 rounded-xl hover:bg-slate-800 text-slate-300 transition flex items-center justify-between group">
+                    <span>03. Rangka, Modul & Coaching</span> <i class="fa-solid fa-chevron-right text-[10px] text-slate-500 group-hover:text-teal-400"></i>
+                </a>
+                <a href="#section-kpi" class="block px-3 py-2 rounded-xl hover:bg-slate-800 text-slate-300 transition flex items-center justify-between group">
+                    <span>10.0 Penilaian KRA & KPI</span> <i class="fa-solid fa-chevron-right text-[10px] text-slate-500 group-hover:text-teal-400"></i>
+                </a>
+                <a href="#section-laporan" class="block px-3 py-2 rounded-xl hover:bg-slate-800 text-slate-300 transition flex items-center justify-between group">
+                    <span>11.0 & 12.0 Pemantauan & Laporan</span> <i class="fa-solid fa-chevron-right text-[10px] text-slate-500 group-hover:text-teal-400"></i>
+                </a>
+                <a href="#section-gets" class="block px-3 py-2 rounded-xl hover:bg-slate-800 text-slate-300 transition flex items-center justify-between group">
+                    <span>04. Impak G.E.T.S & Belanjawan</span> <i class="fa-solid fa-chevron-right text-[10px] text-slate-500 group-hover:text-teal-400"></i>
+                </a>
+            </nav>
+            <div class="pt-4 border-t border-slate-800 text-[11px] text-slate-400">
+                <i class="fa-solid fa-circle-info text-teal-400 mr-1"></i> Klik tajuk indeks untuk pantas melompat ke bahagian buku.
+            </div>
+        </aside>
+
+<!-- BOOK CONTAINER -->
+        <main class="lg:col-span-9 book-page rounded-2xl sm:rounded-3xl border-2 sm:border-4 border-[#e2d9c5] shadow-2xl overflow-hidden relative text-slate-800">
+
+<!-- Book Cover Page Header with Success Image Background -->
+        <section id="section-cover" class="relative bg-slate-900 text-white p-6 sm:p-16 border-b-8 border-teal-800 overflow-hidden">
+            <div class="absolute inset-0 bg-cover bg-center opacity-30" style="background-image: url('https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1600&q=80')"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/90 to-transparent"></div>
+            <div class="relative z-10 max-w-2xl space-y-6">
+                <span class="px-3.5 py-1.5 bg-teal-600 text-white rounded-full text-xs font-bold tracking-widest uppercase shadow-lg">Kertas Kerja Rasmi 2026</span>
+                <h1 class="text-3xl sm:text-5xl font-serif font-extrabold tracking-tight leading-tight text-white">
+                    PROGRAM BIZ TRUST
+                </h1>
+                <p class="text-base sm:text-lg font-serif text-teal-200 italic">
+                    Strategi High-Impact Untuk Scale-Up Bisnes & Pembangunan Penskalaan Perniagaan Berimpak Tinggi
+                </p>
+                <div class="flex flex-wrap items-center gap-4 pt-4 text-xs font-semibold text-slate-300 border-t border-slate-700">
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-clock text-teal-400"></i> Tempoh: 6 Bulan</span>
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-users text-teal-400"></i> 30 Orang Peserta PMKS</span>
+                </div>
+            </div>
+        </section>
+
+<!-- BOOK CONTENT WRAPPER -->
+        <div class="p-4 sm:p-12 space-y-16">
+
+<!-- BAB 1: PENGENALAN & LATAR BELAKANG -->
+            <div id="section-bab1" class="space-y-12 scroll-mt-6">
+                <div class="border-b-2 border-[#e2d9c5] pb-4 flex items-center justify-between">
+                    <h2 class="text-xl sm:text-2xl font-serif font-bold text-slate-900 flex items-center gap-3">
+                        <span class="w-8 h-8 rounded bg-teal-800 text-white text-sm flex items-center justify-center font-sans">01</span> 
+                        Pengenalan & Latar Belakang Program
+                    </h2>
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-widest">Halaman 1</span>
+                </div>
+
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+                    <div class="md:col-span-7 space-y-4 font-serif text-sm text-slate-700 leading-relaxed">
+                        <p class="first-letter:text-4xl first-letter:font-bold first-letter:text-teal-800 first-letter:mr-1">
+                            Dalam era perniagaan moden yang semakin kompleks dan mencabar, kejayaan sesebuah perusahaan tidak lagi diukur semata-mata berdasarkan keuntungan jangka pendek. Sebaliknya, kejayaan perniagaan turut dinilai berdasarkan tahap kemampanan, kecekapan pengurusan, kekuatan sistem operasi serta keupayaan untuk menghasilkan impak yang berterusan.
+                        </p>
+                        <p>
+                            Sehubungan itu, <strong>Program BIZ TRUST</strong> diperkenalkan sebagai satu inisiatif strategik yang bertujuan membimbing usahawan dan pemilik perniagaan untuk membina asas perniagaan yang kukuh, meningkatkan keupayaan pengurusan serta mengembangkan operasi secara sistematik dan mampan.
+                        </p>
+                    </div>
+                    <div class="md:col-span-5">
+                        <div class="bg-white p-4 rounded-2xl border-2 border-[#e2d9c5] shadow-md space-y-3">
+                            <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=800&q=80" alt="Usahawan Sukses Berbincang" class="rounded-xl w-full h-44 object-cover">
+                            <div class="text-center">
+                                <h4 class="font-bold text-xs text-slate-900">Rajah 1.1: Aliran Transformasi Organisasi</h4>
+                                <p class="text-[11px] text-slate-500">Dari Perniagaan Individu Kepada Syarikat Berimpak Tinggi</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+<!-- Cabaran Utama Infographic Cards -->
+                <div class="space-y-4 pt-4">
+                    <h3 class="font-serif font-bold text-lg text-slate-900">2.0 Cabaran Utama Yang Dihadapi PMKS</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-sans">
+                        <div onclick="showNote('Perancangan Strategik', 'Perniagaan tidak mempunyai hala tuju, sasaran pertumbuhan dan pelan tindakan jangka panjang yang jelas.')" class="bg-white p-4 rounded-xl border border-[#e2d9c5] shadow-sm hover:border-teal-600 cursor-pointer transition">
+                            <div class="text-amber-600 font-bold text-base mb-1"><i class="fa-solid fa-compass"></i> 01</div>
+                            <h4 class="font-bold text-slate-900 mb-1">Kelemahan Strategik</h4>
+                            <p class="text-slate-600 text-[11px]">Ketiadaan pelan tindakan jangka panjang yang jelas.</p>
+                        </div>
+                        <div onclick="showNote('Pengurusan Kewangan', 'Rekod kewangan, aliran tunai, kawalan kos dan penyediaan penyata kewangan tidak konsisten.')" class="bg-white p-4 rounded-xl border border-[#e2d9c5] shadow-sm hover:border-teal-600 cursor-pointer transition">
+                            <div class="text-amber-600 font-bold text-base mb-1"><i class="fa-solid fa-coins"></i> 02</div>
+                            <h4 class="font-bold text-slate-900 mb-1">Kewangan Tak Sistematik</h4>
+                            <p class="text-slate-600 text-[11px]">Kawalan aliran tunai & kos kurang konsisten.</p>
+                        </div>
+                        <div onclick="showNote('Kecekapan Operasi', 'Ketiadaan prosedur operasi standard (SOP) dan kebergantungan penuh kepada pemilik perniagaan.')" class="bg-white p-4 rounded-xl border border-[#e2d9c5] shadow-sm hover:border-teal-600 cursor-pointer transition">
+                            <div class="text-amber-600 font-bold text-base mb-1"><i class="fa-solid fa-gears"></i> 03</div>
+                            <h4 class="font-bold text-slate-900 mb-1">Operasi Rendah & SOP</h4>
+                            <p class="text-slate-600 text-[11px]">Kebergantungan kepada pemilik perniagaan.</p>
+                        </div>
+                        <div onclick="showNote('Kesukaran Pembiayaan', 'Dokumentasi kewangan dan tadbir urus kurang kukuh menjejaskan kelayakan mendapatkan dana.')" class="bg-white p-4 rounded-xl border border-[#e2d9c5] shadow-sm hover:border-teal-600 cursor-pointer transition">
+                            <div class="text-amber-600 font-bold text-base mb-1"><i class="fa-solid fa-file-invoice-dollar"></i> 04</div>
+                            <h4 class="font-bold text-slate-900 mb-1">Akses Pembiayaan</h4>
+                            <p class="text-slate-600 text-[11px]">Dokumentasi bankability kurang teratur.</p>
+                        </div>
+                    </div>
+                </div>
+
+<!-- NEW: 3.0 Matlamat Program -->
+                <div class="space-y-4 pt-6">
+                    <h3 class="font-serif font-bold text-lg text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-bullseye text-teal-700"></i> 3.0 Matlamat Program
+                    </h3>
+                    <div class="bg-white p-6 rounded-2xl border border-[#e2d9c5] shadow-sm space-y-3 font-serif text-sm text-slate-700 leading-relaxed">
+                        <p>
+                            Matlamat utama program adalah untuk membangunkan usahawan dan perusahaan yang mempunyai keupayaan pengurusan profesional, berdaya saing, berstruktur dan mampan melalui pendekatan transformasi perniagaan secara menyeluruh.
+                        </p>
+                        <p>
+                            Program ini turut bertujuan melahirkan perusahaan yang mampu meningkatkan jualan, mengoptimumkan penggunaan sumber, memperkukuh kedudukan kewangan, meningkatkan produktiviti serta mempunyai keupayaan untuk berkembang ke pasaran yang lebih luas.
+                        </p>
+                    </div>
+                </div>
+
+<!-- NEW: 4.0 Objektif Program -->
+                <div class="space-y-4 pt-6">
+                    <h3 class="font-serif font-bold text-lg text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-teal-700"></i> 4.0 Objektif Program
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 font-sans text-xs">
+                        <div class="bg-white p-4 rounded-xl border border-[#e2d9c5] shadow-sm flex gap-3 items-start">
+                            <span class="w-6 h-6 rounded-full bg-teal-100 text-teal-800 font-bold flex items-center justify-center shrink-0">4.1</span>
+                            <div><strong class="text-slate-900 block mb-1">Diagnostik Menyeluruh</strong> Menilai tahap prestasi semasa dan potensi pertumbuhan syarikat melalui sesi diagnostik perniagaan.</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-[#e2d9c5] shadow-sm flex gap-3 items-start">
+                            <span class="w-6 h-6 rounded-full bg-teal-100 text-teal-800 font-bold flex items-center justify-center shrink-0">4.2</span>
+                            <div><strong class="text-slate-900 block mb-1">Analisis SWOT & TOWS</strong> Mengenal pasti kekuatan, kelemahan, peluang dan ancaman serta aspek penambahbaikan.</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-[#e2d9c5] shadow-sm flex gap-3 items-start">
+                            <span class="w-6 h-6 rounded-full bg-teal-100 text-teal-800 font-bold flex items-center justify-center shrink-0">4.3</span>
+                            <div><strong class="text-slate-900 block mb-1">Pelan Tindakan Komprehensif</strong> Menyediakan pelan transformasi perniagaan yang bersesuaian dengan matlamat strategik syarikat.</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-[#e2d9c5] shadow-sm flex gap-3 items-start">
+                            <span class="w-6 h-6 rounded-full bg-teal-100 text-teal-800 font-bold flex items-center justify-center shrink-0">4.4</span>
+                            <div><strong class="text-slate-900 block mb-1">Sokongan Kepakaran</strong> Membimbing pelaksanaan pelan melalui kepakaran teknikal, pengurusan dan pembangunan.</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-[#e2d9c5] shadow-sm flex gap-3 items-start">
+                            <span class="w-6 h-6 rounded-full bg-teal-100 text-teal-800 font-bold flex items-center justify-center shrink-0">4.5</span>
+                            <div><strong class="text-slate-900 block mb-1">Peningkatan Daya Saing</strong> Meningkatkan kecekapan operasi, produktiviti dan kelestarian menghadapi cabaran pasaran.</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-[#e2d9c5] shadow-sm flex gap-3 items-start">
+                            <span class="w-6 h-6 rounded-full bg-teal-100 text-teal-800 font-bold flex items-center justify-center shrink-0">4.6</span>
+                            <div><strong class="text-slate-900 block mb-1">Kesediaan Pembiayaan (Bankable)</strong> Membantu usahawan mengurus komitmen pembiayaan dan mendapatkan dana pengembangan.</div>
+                        </div>
+                    </div>
+                </div>
+
+<!-- NEW: 5.0 Tujuan Pelaksanaan Program -->
+                <div class="space-y-4 pt-6">
+                    <h3 class="font-serif font-bold text-lg text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-flag text-teal-700"></i> 5.0 Tujuan Pelaksanaan Program
+                    </h3>
+                    <p class="font-serif text-sm text-slate-700">
+                        Program ini bertujuan mewujudkan satu platform pembangunan strategik yang memfokuskan kepada pembinaan perniagaan mampan (sustainable business) dalam kalangan usahawan dan pemilik PMKS. Secara khusus, tumpuan merangkumi:
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 font-sans text-xs">
+                        <div class="bg-white p-4 rounded-xl border border-[#e2d9c5] shadow-sm space-y-2">
+                            <div class="text-teal-700 font-bold"><i class="fa-solid fa-seedling"></i> 01. Asas Mampan</div>
+                            <p class="text-slate-600">Memperkukuh pengurusan strategi, operasi, sumber manusia dan kewangan.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-[#e2d9c5] shadow-sm space-y-2">
+                            <div class="text-teal-700 font-bold"><i class="fa-solid fa-handshake"></i> 02. Budaya Bertanggungjawab</div>
+                            <p class="text-slate-600">Membentuk usahawan yang mengambil kira nilai komuniti, alam sekitar & pihak berkepentingan.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-[#e2d9c5] shadow-sm space-y-2">
+                            <div class="text-teal-700 font-bold"><i class="fa-solid fa-chart-line"></i> 03. Peningkatan Daya Saing</div>
+                            <p class="text-slate-600">Menggalakkan amalan penskalaan berstruktur untuk kedudukan pasaran lebih tinggi.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-[#e2d9c5] shadow-sm space-y-2">
+                            <div class="text-teal-700 font-bold"><i class="fa-solid fa-shield-halved"></i> 04. Pengukuhan Tadbir Urus</div>
+                            <p class="text-slate-600">Meningkatkan pematuhan terhadap prosedur, standard operasi dan tadbir urus baik.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-[#e2d9c5] shadow-sm space-y-2">
+                            <div class="text-teal-700 font-bold"><i class="fa-solid fa-network-wired"></i> 05. Jaringan Strategik</div>
+                            <p class="text-slate-600">Membuka peluang kolaborasi, perkongsian kepakaran dan kerjasama di peringkat tempatan & global.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-[#e2d9c5] shadow-sm space-y-2">
+                            <div class="text-teal-700 font-bold"><i class="fa-solid fa-coins"></i> 06. Akses Pembiayaan</div>
+                            <p class="text-slate-600">Membina struktur pengurusan dan dokumentasi teratur menyokong pertumbuhan & dana.</p>
+                        </div>
+                    </div>
+                </div>
+
+<!-- NEW: 6.0 Kumpulan Sasaran dan Skop Penyertaan -->
+                <div class="space-y-4 pt-6">
+                    <h3 class="font-serif font-bold text-lg text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-users text-teal-700"></i> 6.0 Kumpulan Sasaran dan Skop Penyertaan
+                    </h3>
+                    <div class="bg-white p-6 rounded-2xl border border-[#e2d9c5] shadow-sm space-y-4 font-serif text-sm text-slate-700 leading-relaxed">
+                        <p>
+                            Program ini menyasarkan seramai tiga puluh (30) orang usahawan atau pemilik syarikat yang terdiri daripada perusahaan mikro, kecil dan sederhana (PMKS).
+                        </p>
+                        <div>
+                            <strong class="text-slate-900 font-sans text-xs uppercase tracking-wider block mb-2 text-teal-800">Kriteria Umum Penyertaan:</strong>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 font-sans text-xs">
+                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex gap-2.5 items-start">
+                                    <span class="font-bold text-teal-700">1.</span>
+                                    <span>Pemilik atau pengurusan utama perniagaan yang aktif beroperasi.</span>
+                                </div>
+                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex gap-2.5 items-start">
+                                    <span class="font-bold text-teal-700">2.</span>
+                                    <span>Mempunyai produk atau perkhidmatan yang telah dipasarkan.</span>
+                                </div>
+                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex gap-2.5 items-start">
+                                    <span class="font-bold text-teal-700">3.</span>
+                                    <span>Mempunyai komitmen untuk mengembangkan dan meningkatkan prestasi perniagaan.</span>
+                                </div>
+                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex gap-2.5 items-start">
+                                    <span class="font-bold text-teal-700">4.</span>
+                                    <span>Bersedia mengikuti keseluruhan program selama enam (6) bulan.</span>
+                                </div>
+                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex gap-2.5 items-start">
+                                    <span class="font-bold text-teal-700">5.</span>
+                                    <span>Bersedia menyediakan maklumat dan dokumen perniagaan bagi tujuan penilaian prestasi.</span>
+                                </div>
+                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex gap-2.5 items-start">
+                                    <span class="font-bold text-teal-700">6.</span>
+                                    <span>Bersedia menetapkan sasaran pertumbuhan dan melaksanakan pelan tindakan penambahbaikan.</span>
+                                </div>
+                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex gap-2.5 items-start sm:col-span-2">
+                                    <span class="font-bold text-teal-700">7.</span>
+                                    <span>Mempunyai kesediaan untuk mengikuti sesi latihan, coaching dan pemantauan.</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-600 italic bg-teal-50/50 p-3 rounded-xl border border-teal-100">
+                            <strong>Nota Keutamaan:</strong> Keutamaan penyertaan boleh diberikan kepada syarikat yang mempunyai potensi pertumbuhan, komitmen pengembangan perniagaan dan kesediaan untuk melaksanakan transformasi pengurusan.
+                        </p>
+                    </div>
+                </div>
+
+</div>
+
+<!-- BAB 2: KERANGKA M.O.F.A.S.S -->
+            <div id="section-mofass" class="space-y-6 pt-8 border-t-2 border-[#e2d9c5] scroll-mt-6">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl sm:text-2xl font-serif font-bold text-slate-900 flex items-center gap-3">
+                        <span class="w-8 h-8 rounded bg-teal-800 text-white text-sm flex items-center justify-center font-sans">02</span> 
+                        Kerangka Diagnostik M.O.F.A.S.S
+                    </h2>
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-widest">Halaman 2</span>
+                </div>
+                <p class="font-serif text-sm text-slate-700">
+                    Program BIZ TRUST menggunakan kerangka <strong>M.O.F.A.S.S</strong> sebagai asas diagnostik dan bimbingan merangkumi 6 komponen utama perniagaan:
+                </p>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 font-sans">
+                    <div class="bg-white p-5 rounded-2xl border border-[#e2d9c5] shadow-sm flex gap-4 items-start">
+                        <div class="w-10 h-10 rounded-xl bg-blue-100 text-primary flex items-center justify-center font-bold text-base shrink-0">M</div>
+                        <div>
+                            <h4 class="font-bold text-sm text-slate-900">Marketing (Pemasaran)</h4>
+                            <p class="text-xs text-slate-600 mt-1">Strategi pengiklanan, CSR, kesedaran jenama & penembusan pasaran.</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-[#e2d9c5] shadow-sm flex gap-4 items-start">
+                        <div class="w-10 h-10 rounded-xl bg-teal-100 text-teal-800 flex items-center justify-center font-bold text-base shrink-0">O</div>
+                        <div>
+                            <h4 class="font-bold text-sm text-slate-900">Operation (Operasi)</h4>
+                            <p class="text-xs text-slate-600 mt-1">Kecekapan proses kerja, kapasiti pengeluaran & pematuhan SOP.</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-[#e2d9c5] shadow-sm flex gap-4 items-start">
+                        <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-base shrink-0">F</div>
+                        <div>
+                            <h4 class="font-bold text-sm text-slate-900">Finance & Account</h4>
+                            <p class="text-xs text-slate-600 mt-1">Kawalan kos, unjuran aliran tunai & penyata akaun teratur.</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-[#e2d9c5] shadow-sm flex gap-4 items-start">
+                        <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-800 flex items-center justify-center font-bold text-base shrink-0">A</div>
+                        <div>
+                            <h4 class="font-bold text-sm text-slate-900">Administration & HR</h4>
+                            <p class="text-xs text-slate-600 mt-1">Pengurusan tenaga kerja, budaya organisasi & deskripsi tugas (JD).</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-[#e2d9c5] shadow-sm flex gap-4 items-start">
+                        <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-800 flex items-center justify-center font-bold text-base shrink-0">S</div>
+                        <div>
+                            <h4 class="font-bold text-sm text-slate-900">Sales (Jualan)</h4>
+                            <p class="text-xs text-slate-600 mt-1">Peningkatan hasil jualan, pelanggan baharu B2C & B2B.</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-[#e2d9c5] shadow-sm flex gap-4 items-start">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-base shrink-0">S</div>
+                        <div>
+                            <h4 class="font-bold text-sm text-slate-900">System (Sistem & Automasi)</h4>
+                            <p class="text-xs text-slate-600 mt-1">Pendigitalan proses kerja, ERP/POS dan automasi produktiviti.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+<!-- BAB 3: RANGKA & 10 MODUL LATIHAN -->
+            <div id="section-bab2" class="space-y-6 pt-8 border-t-2 border-[#e2d9c5] scroll-mt-6">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl sm:text-2xl font-serif font-bold text-slate-900 flex items-center gap-3">
+                        <span class="w-8 h-8 rounded bg-teal-800 text-white text-sm flex items-center justify-center font-sans">03</span> 
+                        Rangka Pelaksanaan & 10 Modul Latihan
+                    </h2>
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-widest">Halaman 3</span>
+                </div>
+
+<!-- NEW: CARTA ALIR TERPERINCI 6 BULAN (TIMELINE & FLOWCHART) -->
+                <div class="bg-gradient-to-br from-slate-900 to-teal-950 text-white p-6 sm:p-8 rounded-3xl shadow-xl space-y-6 font-sans">
+                    <div class="text-center space-y-2 max-w-2xl mx-auto">
+                        <span class="px-3 py-1 bg-teal-500/20 border border-teal-500/30 text-teal-300 rounded-full text-xs font-semibold uppercase tracking-wider">
+                            <i class="fa-solid fa-route"></i> Carta Alir Strategik 6 Bulan
+                        </span>
+                        <h3 class="text-xl sm:text-2xl font-serif font-bold text-amber-100">Aliran Masa, Aktiviti & Hasil Jangkaan Program</h3>
+                        <p class="text-xs text-slate-300">Panduan visual menyeluruh setiap fasa pelaksanaan bagi 30 peserta PMKS terpilih.</p>
+                    </div>
+
+<div class="grid grid-cols-1 md:grid-cols-5 gap-4 relative">
+                        <!-- Fasa 1 -->
+                        <div class="bg-white/10 border border-white/20 p-4 rounded-2xl flex flex-col justify-between space-y-3 backdrop-blur">
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-[10px] bg-teal-600 text-white font-bold px-2 py-0.5 rounded-full">Bulan 1</span>
+                                    <i class="fa-solid fa-clipboard-check text-teal-300 text-sm"></i>
+                                </div>
+                                <h4 class="font-bold text-sm text-teal-200">Fasa 1: Persediaan & Saringan</h4>
+                                <ul class="text-[11px] text-slate-300 mt-2 space-y-1 list-disc list-inside">
+                                    <li>Hebahan & pendaftaran</li>
+                                    <li>Saringan 30 peserta</li>
+                                    <li>Diagnostik awal BMC</li>
+                                    <li>Lawatan pemantauan #1</li>
+                                </ul>
+                            </div>
+                            <div class="pt-2 border-t border-white/10 text-[10px] text-amber-300 font-medium">
+                                <i class="fa-solid fa-bullseye"></i> Hasil: Profil & asas baseline syarikat siap.
+                            </div>
+                        </div>
+
+<!-- Fasa 2 -->
+                        <div class="bg-white/10 border border-white/20 p-4 rounded-2xl flex flex-col justify-between space-y-3 backdrop-blur">
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-[10px] bg-teal-600 text-white font-bold px-2 py-0.5 rounded-full">Bulan 2</span>
+                                    <i class="fa-solid fa-graduation-cap text-teal-300 text-sm"></i>
+                                </div>
+                                <h4 class="font-bold text-sm text-teal-200">Fasa 2: Latihan Keusahawanan</h4>
+                                <ul class="text-[11px] text-slate-300 mt-2 space-y-1 list-disc list-inside">
+                                    <li>Pelaksanaan 10 modul</li>
+                                    <li>Kajian kes & bengkel</li>
+                                    <li>Penyediaan pelan tindakan</li>
+                                    <li>Permulaan coaching</li>
+                                </ul>
+                            </div>
+                            <div class="pt-2 border-t border-white/10 text-[10px] text-amber-300 font-medium">
+                                <i class="fa-solid fa-bullseye"></i> Hasil: Pemahaman modul & pelan transformasi awal.
+                            </div>
+                        </div>
+
+<!-- Fasa 3 -->
+                        <div class="bg-white/10 border border-white/20 p-4 rounded-2xl flex flex-col justify-between space-y-3 backdrop-blur">
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-[10px] bg-teal-600 text-white font-bold px-2 py-0.5 rounded-full">Bulan 2 - 4</span>
+                                    <i class="fa-solid fa-comments text-teal-300 text-sm"></i>
+                                </div>
+                                <h4 class="font-bold text-sm text-teal-200">Fasa 3: Coaching Berterusan</h4>
+                                <ul class="text-[11px] text-slate-300 mt-2 space-y-1 list-disc list-inside">
+                                    <li>Sesi bimbingan individu</li>
+                                    <li>Coaching berkumpulan</li>
+                                    <li>Fokus kerangka MOFASS</li>
+                                    <li>Sesi sembang santai / AI</li>
+                                </ul>
+                            </div>
+                            <div class="pt-2 border-t border-white/10 text-[10px] text-amber-300 font-medium">
+                                <i class="fa-solid fa-bullseye"></i> Hasil: Pelaksanaan SOP & penyelesaian isu operasi.
+                            </div>
+                        </div>
+
+<!-- Fasa 4 -->
+                        <div class="bg-white/10 border border-white/20 p-4 rounded-2xl flex flex-col justify-between space-y-3 backdrop-blur">
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-[10px] bg-teal-600 text-white font-bold px-2 py-0.5 rounded-full">Bulan 5</span>
+                                    <i class="fa-solid fa-magnifying-glass-chart text-teal-300 text-sm"></i>
+                                </div>
+                                <h4 class="font-bold text-sm text-teal-200">Fasa 4: Pemantauan Premis</h4>
+                                <ul class="text-[11px] text-slate-300 mt-2 space-y-1 list-disc list-inside">
+                                    <li>Lawatan tapak #2</li>
+                                    <li>Penilaian kemajuan KPI</li>
+                                    <li>Intervensi pakar bidang</li>
+                                    <li>Semakan laporan bulanan</li>
+                                </ul>
+                            </div>
+                            <div class="pt-2 border-t border-white/10 text-[10px] text-amber-300 font-medium">
+                                <i class="fa-solid fa-bullseye"></i> Hasil: Penambaikan langsung proses kerja & kualiti.
+                            </div>
+                        </div>
+
+<!-- Fasa 5 -->
+                        <div class="bg-white/10 border border-white/20 p-4 rounded-2xl flex flex-col justify-between space-y-3 backdrop-blur">
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-[10px] bg-amber-600 text-white font-bold px-2 py-0.5 rounded-full">Bulan 6</span>
+                                    <i class="fa-solid fa-award text-amber-300 text-sm"></i>
+                                </div>
+                                <h4 class="font-bold text-sm text-teal-200">Fasa 5: Penilaian & Laporan</h4>
+                                <ul class="text-[11px] text-slate-300 mt-2 space-y-1 list-disc list-inside">
+                                    <li>Penilaian akhir prestasi</li>
+                                    <li>Analisis perbandingan KPI</li>
+                                    <li>Penyediaan dashboard</li>
+                                    <li>Mentoring tambahan 3 bln</li>
+                                </ul>
+                            </div>
+                            <div class="pt-2 border-t border-white/10 text-[10px] text-amber-300 font-medium">
+                                <i class="fa-solid fa-bullseye"></i> Hasil: Laporan akhir & penskalaan perniagaan (GETS).
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 font-sans">
+                    <!-- Fasa Pelaksanaan (Existing Detailed Text) -->
+                    <div class="bg-white p-6 rounded-2xl border border-[#e2d9c5] space-y-4">
+                        <h3 class="font-bold text-base text-slate-900 flex items-center gap-2 border-b border-[#e2d9c5] pb-2">
+                            <i class="fa-solid fa-calendar-days text-teal-700"></i> Ringkasan Jadual Aktiviti Utama
+                        </h3>
+                        <div class="space-y-3 text-xs">
+                            <div class="flex items-start gap-3 p-3 bg-slate-50 rounded-xl">
+                                <span class="w-6 h-6 rounded bg-primary text-white font-bold flex items-center justify-center shrink-0">1</span>
+                                <div><strong>Bulan 1:</strong> Persediaan, penyaringan 30 peserta & diagnostik awal perniagaan.</div>
+                            </div>
+                            <div class="flex items-start gap-3 p-3 bg-slate-50 rounded-xl">
+                                <span class="w-6 h-6 rounded bg-primary text-white font-bold flex items-center justify-center shrink-0">2</span>
+                                <div><strong>Bulan 2:</strong> Latihan keusahawanan intensif (10 modul utama).</div>
+                            </div>
+                            <div class="flex items-start gap-3 p-3 bg-slate-50 rounded-xl">
+                                <span class="w-6 h-6 rounded bg-teal-700 text-white font-bold flex items-center justify-center shrink-0">3</span>
+                                <div><strong>Bulan 2-6:</strong> Sesi coaching individu & berkumpulan berterusan.</div>
+                            </div>
+                            <div class="flex items-start gap-3 p-3 bg-slate-50 rounded-xl">
+                                <span class="w-6 h-6 rounded bg-teal-700 text-white font-bold flex items-center justify-center shrink-0">4</span>
+                                <div><strong>Bulan 1 & 5:</strong> Lawatan pemantauan tapak premis peserta.</div>
+                            </div>
+                            <div class="flex items-start gap-3 p-3 bg-slate-50 rounded-xl">
+                                <span class="w-6 h-6 rounded bg-amber-700 text-white font-bold flex items-center justify-center shrink-0">5</span>
+                                <div><strong>Bulan 6:</strong> Penilaian akhir prestasi, analisis KPI & laporan dashboard.</div>
+                            </div>
+                        </div>
+                    </div>
+
+<!-- 10 Modul -->
+                    <div class="bg-white p-6 rounded-2xl border border-[#e2d9c5] space-y-4">
+                        <h3 class="font-bold text-base text-slate-900 flex items-center gap-2 border-b border-[#e2d9c5] pb-2">
+                            <i class="fa-solid fa-graduation-cap text-teal-700"></i> 10 Modul Komprehensif
+                        </h3>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 font-medium">1. Diagnostik & BMC</div>
+                            <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 font-medium">2. Perancangan Strategik</div>
+                            <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 font-medium">3. Kewangan & Aliran Tunai</div>
+                            <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 font-medium">4. Kepimpinan & Perubahan</div>
+                            <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 font-medium">5. Operasi & SOP</div>
+                            <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 font-medium">6. Pendigitalan & Automasi</div>
+                            <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 font-medium">7. Penjenamaan & Harta Intelek</div>
+                            <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 font-medium">8. Akses Pembiayaan</div>
+                            <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 font-medium">9. Pemasaran Digital</div>
+                            <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 font-medium">10. Skalabiliti & Francais</div>
+                        </div>
+                    </div>
+                </div>
+
+<!-- NEW: Detailed 10 Training Modules Content Section -->
+                <div class="space-y-6 pt-6">
+                    <div class="border-l-4 border-teal-700 pl-4">
+                        <h3 class="font-serif font-bold text-xl text-slate-900">Perincian 10 Modul Latihan Keusahawanan</h3>
+                        <p class="text-xs text-slate-600 font-serif">Latihan keusahawanan merangkumi sepuluh modul komprehensif yang disusun secara sistematik bagi meningkatkan keupayaan pengurusan, kepimpinan dan pertumbuhan perniagaan.</p>
+                    </div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 font-sans text-xs">
+                        <!-- Modul 1 -->
+                        <div class="bg-white p-5 rounded-2xl border border-[#e2d9c5] shadow-sm space-y-3">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                <span class="font-bold text-teal-800 text-sm">MODUL 1: DIAGNOSTIK PERNIAGAAN & PRESTASI</span>
+                                <i class="fa-solid fa-stethoscope text-teal-600"></i>
+                            </div>
+                            <p class="text-slate-700 font-serif italic text-[11px]"><strong>Objektif:</strong> Membimbing peserta mengenal pasti kedudukan semasa syarikat, kekuatan dan kelemahan serta menetapkan hala tuju pertumbuhan yang jelas.</p>
+                            <div>
+                                <strong class="text-slate-900 block mb-1 uppercase text-[10px] tracking-wider text-teal-700">Kandungan Modul:</strong>
+                                <ul class="list-disc list-inside space-y-1 text-slate-600">
+                                    <li>Analisis SWOT dan TOWS Matrix.</li>
+                                    <li>Analisis Model Perniagaan (Business Model Canvas – BMC).</li>
+                                    <li>Penilaian prestasi dan keupayaan perniagaan.</li>
+                                    <li>Pembangunan Prosedur Operasi Standard (SOP).</li>
+                                    <li>Penyediaan template SOP HR, Kewangan & Operasi.</li>
+                                    <li>Penyediaan peta hala tuju perniagaan (Business Roadmap).</li>
+                                </ul>
+                            </div>
+                        </div>
+
+<!-- Modul 2 -->
+                        <div class="bg-white p-5 rounded-2xl border border-[#e2d9c5] shadow-sm space-y-3">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                <span class="font-bold text-teal-800 text-sm">MODUL 2: PERANCANGAN STRATEGIK</span>
+                                <i class="fa-solid fa-chess text-teal-600"></i>
+                            </div>
+                            <p class="text-slate-700 font-serif italic text-[11px]"><strong>Objektif:</strong> Membimbing peserta merangka pelan tindakan strategik yang bersesuaian dengan matlamat dan hala tuju syarikat.</p>
+                            <div>
+                                <strong class="text-slate-900 block mb-1 uppercase text-[10px] tracking-wider text-teal-700">Kandungan Modul:</strong>
+                                <ul class="list-disc list-inside space-y-1 text-slate-600">
+                                    <li>Perancangan strategik perniagaan.</li>
+                                    <li>Penetapan visi, misi dan sasaran pertumbuhan.</li>
+                                    <li>Transformasi digital korporat.</li>
+                                    <li>Pembangunan jenama dan pasaran.</li>
+                                    <li>Strategi pengembangan dan peluasan pasaran.</li>
+                                    <li>Penyediaan pelan transformasi perniagaan.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+<!-- Modul 3 -->
+                        <div class="bg-white p-5 rounded-2xl border border-[#e2d9c5] shadow-sm space-y-3">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                <span class="font-bold text-teal-800 text-sm">MODUL 3: PENGURUSAN KEWANGAN</span>
+                                <i class="fa-solid fa-coins text-teal-600"></i>
+                            </div>
+                            <p class="text-slate-700 font-serif italic text-[11px]"><strong>Objektif:</strong> Meningkatkan keupayaan peserta mengurus kewangan, mengawal kos dan merancang aliran tunai memastikan kestabilan.</p>
+                            <div>
+                                <strong class="text-slate-900 block mb-1 uppercase text-[10px] tracking-wider text-teal-700">Kandungan Modul:</strong>
+                                <ul class="list-disc list-inside space-y-1 text-slate-600">
+                                    <li>Pengurusan aliran tunai (Cash Flow).</li>
+                                    <li>Kawalan kos dan perbelanjaan efektif.</li>
+                                    <li>Analisis keuntungan dan margin.</li>
+                                    <li>Penyediaan bajet perniagaan menyeluruh.</li>
+                                    <li>Perancangan kewangan jangka pendek & panjang.</li>
+                                    <li>Analisis prestasi kewangan korporat.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+<!-- Modul 4 -->
+                        <div class="bg-white p-5 rounded-2xl border border-[#e2d9c5] shadow-sm space-y-3">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                <span class="font-bold text-teal-800 text-sm">MODUL 4: KEPIMPINAN & PERUBAHAN</span>
+                                <i class="fa-solid fa-user-tie text-teal-600"></i>
+                            </div>
+                            <p class="text-slate-700 font-serif italic text-[11px]"><strong>Objektif:</strong> Meningkatkan keupayaan kepimpinan usahawan dalam memacu perubahan serta membina budaya kerja progresif.</p>
+                            <div>
+                                <strong class="text-slate-900 block mb-1 uppercase text-[10px] tracking-wider text-teal-700">Kandungan Modul:</strong>
+                                <ul class="list-disc list-inside space-y-1 text-slate-600">
+                                    <li>Kepimpinan transformasional.</li>
+                                    <li>Pengurusan perubahan organisasi (Change Management).</li>
+                                    <li>Pembangunan budaya kerja positif.</li>
+                                    <li>Pengurusan pasukan berprestasi tinggi.</li>
+                                    <li>Komunikasi dan penyelesaian konflik.</li>
+                                    <li>Pembangunan bakat & perancangan penggantian.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+<!-- Modul 5 -->
+                        <div class="bg-white p-5 rounded-2xl border border-[#e2d9c5] shadow-sm space-y-3">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                <span class="font-bold text-teal-800 text-sm">MODUL 5: KECEKAPAN OPERASI</span>
+                                <i class="fa-solid fa-gears text-teal-600"></i>
+                            </div>
+                            <p class="text-slate-700 font-serif italic text-[11px]"><strong>Objektif:</strong> Membekalkan peserta dengan kaedah pengurusan operasi sistematik meningkatkan produktiviti dan kualiti.</p>
+                            <div>
+                                <strong class="text-slate-900 block mb-1 uppercase text-[10px] tracking-wider text-teal-700">Kandungan Modul:</strong>
+                                <ul class="list-disc list-inside space-y-1 text-slate-600">
+                                    <li>Penetapan petunjuk prestasi utama (KPI).</li>
+                                    <li>Penyediaan aliran kerja (Workflow).</li>
+                                    <li>Pembangunan dan pelaksanaan SOP.</li>
+                                    <li>Pemantauan produktiviti harian.</li>
+                                    <li>Pengoptimuman sumber dan kos operasi.</li>
+                                    <li>Integrasi teknologi dalam operasi.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+<!-- Modul 6 -->
+                        <div class="bg-white p-5 rounded-2xl border border-[#e2d9c5] shadow-sm space-y-3">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                <span class="font-bold text-teal-800 text-sm">MODUL 6: PENDIGITALAN & AUTOMASI</span>
+                                <i class="fa-solid fa-laptop-code text-teal-600"></i>
+                            </div>
+                            <p class="text-slate-700 font-serif italic text-[11px]"><strong>Objektif:</strong> Memperkenalkan penggunaan teknologi digital dan sistem automasi meningkatkan kecekapan pengurusan.</p>
+                            <div>
+                                <strong class="text-slate-900 block mb-1 uppercase text-[10px] tracking-wider text-teal-700">Kandungan Modul:</strong>
+                                <ul class="list-disc list-inside space-y-1 text-slate-600">
+                                    <li>Penggunaan teknologi dalam operasi.</li>
+                                    <li>Sistem pengurusan pelanggan (CRM).</li>
+                                    <li>Automasi proses kerja (Workflow Automation).</li>
+                                    <li>Penggunaan aplikasi digital moden.</li>
+                                    <li>Integrasi sistem pengurusan perniagaan.</li>
+                                    <li>Teknologi untuk pemantauan prestasi.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+<!-- Modul 7 -->
+                        <div class="bg-white p-5 rounded-2xl border border-[#e2d9c5] shadow-sm space-y-3">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                <span class="font-bold text-teal-800 text-sm">MODUL 7: PENJENAMAAN & HARTA INTELEK</span>
+                                <i class="fa-solid fa-bullhorn text-teal-600"></i>
+                            </div>
+                            <p class="text-slate-700 font-serif italic text-[11px]"><strong>Objektif:</strong> Membantu peserta membangunkan identiti jenama yang kukuh, profesional dan berdaya saing.</p>
+                            <div>
+                                <strong class="text-slate-900 block mb-1 uppercase text-[10px] tracking-wider text-teal-700">Kandungan Modul:</strong>
+                                <ul class="list-disc list-inside space-y-1 text-slate-600">
+                                    <li>Teknik membina identiti jenama (Branding).</li>
+                                    <li>Strategi pemasaran jenama strategik.</li>
+                                    <li>Pembangunan kredibiliti & kesedaran jenama.</li>
+                                    <li>Pelan hala tuju penjenamaan jangka panjang.</li>
+                                    <li>Pendaftaran & perlindungan harta intelek (IP).</li>
+                                    <li>Strategi rebranding & pembungkusan produk.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+<!-- Modul 8 -->
+                        <div class="bg-white p-5 rounded-2xl border border-[#e2d9c5] shadow-sm space-y-3">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                <span class="font-bold text-teal-800 text-sm">MODUL 8: AKSES PEMBIAYAAN & TADBIR URUS</span>
+                                <i class="fa-solid fa-file-invoice-dollar text-teal-600"></i>
+                            </div>
+                            <p class="text-slate-700 font-serif italic text-[11px]"><strong>Objektif:</strong> Memberikan panduan mengenai peluang pembiayaan, penyediaan dokumen dan amalan tadbir urus baik.</p>
+                            <div>
+                                <strong class="text-slate-900 block mb-1 uppercase text-[10px] tracking-wider text-teal-700">Kandungan Modul:</strong>
+                                <ul class="list-disc list-inside space-y-1 text-slate-600">
+                                    <li>Pengenalpastian sumber pembiayaan & dana.</li>
+                                    <li>Persediaan syarikat mendapatkan pembiayaan.</li>
+                                    <li>Penyediaan dokumen kewangan bankable.</li>
+                                    <li>Pengurusan rekod & dokumentasi korporat.</li>
+                                    <li>Amalan tadbir urus korporat (Corporate Governance).</li>
+                                    <li>Kesediaan menarik pelabur & rakan strategik.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+<!-- Modul 9 -->
+                        <div class="bg-white p-5 rounded-2xl border border-[#e2d9c5] shadow-sm space-y-3">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                <span class="font-bold text-teal-800 text-sm">MODUL 9: STRATEGI PEMASARAN & PASARAN</span>
+                                <i class="fa-solid fa-chart-line text-teal-600"></i>
+                            </div>
+                            <p class="text-slate-700 font-serif italic text-[11px]"><strong>Objektif:</strong> Meningkatkan keupayaan peserta merancang strategi pemasaran berkesan menembusi pasaran baharu.</p>
+                            <div>
+                                <strong class="text-slate-900 block mb-1 uppercase text-[10px] tracking-wider text-teal-700">Kandungan Modul:</strong>
+                                <ul class="list-disc list-inside space-y-1 text-slate-600">
+                                    <li>Strategi pemasaran digital lanjutan.</li>
+                                    <li>Pembangunan jenama produk & perkhidmatan.</li>
+                                    <li>Analisis pasaran & pelanggan sasaran (Target Market).</li>
+                                    <li>Strategi pemasaran pelbagai saluran (Omnichannel).</li>
+                                    <li>Pengukuhan perhubungan pelanggan (Loyalty).</li>
+                                    <li>Penggunaan data analitik pemasaran.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+<!-- Modul 10 -->
+                        <div class="bg-white p-5 rounded-2xl border border-[#e2d9c5] shadow-sm space-y-3">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                <span class="font-bold text-teal-800 text-sm">MODUL 10: SKALABILITI & PERKEMBANGAN</span>
+                                <i class="fa-solid fa-rocket text-teal-600"></i>
+                            </div>
+                            <p class="text-slate-700 font-serif italic text-[11px]"><strong>Objektif:</strong> Membimbing peserta merancang strategi pengembangan perniagaan secara sistematik dan mampan.</p>
+                            <div>
+                                <strong class="text-slate-900 block mb-1 uppercase text-[10px] tracking-wider text-teal-700">Kandungan Modul:</strong>
+                                <ul class="list-disc list-inside space-y-1 text-slate-600">
+                                    <li>Strategi penembusan sektor dan pasaran baharu.</li>
+                                    <li>Pelan pertumbuhan jangka panjang (Scaling).</li>
+                                    <li>Pengembangan operasi & pembukaan cawangan.</li>
+                                    <li>Model francais dan pelesenan perniagaan.</li>
+                                    <li>Strategi kerjasama & perkongsian strategik.</li>
+                                    <li>Persediaan memasuki pasaran eksport & global.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+<!-- NEW SECTION: SESI BIMBINGAN (COACHING) -->
+                    <div class="space-y-6 pt-8 border-t border-[#e2d9c5]">
+                        <div class="border-l-4 border-teal-700 pl-4">
+                            <h3 class="font-serif font-bold text-xl text-slate-900">SESI BIMBINGAN (COACHING)</h3>
+                            <p class="text-xs text-slate-600 font-serif">Sesi coaching merupakan komponen utama program bagi memastikan ilmu dan kemahiran yang diperoleh semasa latihan dapat diterjemahkan kepada perubahan sebenar dalam pengurusan perniagaan peserta.</p>
+                        </div>
+
+<p class="font-serif text-sm text-slate-700">Pelaksanaan coaching dibahagikan kepada dua bentuk utama:</p>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 font-sans text-xs">
+                            <!-- 9.1 Bimbingan Individu -->
+                            <div class="bg-white p-5 rounded-2xl border border-[#e2d9c5] shadow-sm space-y-3">
+                                <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                    <span class="font-bold text-teal-800 text-sm">9.1 Bimbingan Individu</span>
+                                    <i class="fa-solid fa-user-check text-teal-600"></i>
+                                </div>
+                                <p class="text-slate-700 font-serif text-[11px] leading-relaxed">
+                                    Setiap peserta akan mengikuti sekurang-kurangnya tiga (3) sesi bimbingan individu, dengan minimum dua (2) sesi dijalankan secara bersemuka. Sesi bimbingan merangkumi aspek pembangunan kendiri (life coaching) dan pembangunan perniagaan (business coaching).
+                                </p>
+                                <div>
+                                    <strong class="text-slate-900 block mb-1 uppercase text-[10px] tracking-wider text-teal-700">6 Komponen M.O.F.A.S.S:</strong>
+                                    <ol class="list-decimal list-inside space-y-1 text-slate-600">
+                                        <li>Pemasaran (Marketing).</li>
+                                        <li>Operasi (Operation).</li>
+                                        <li>Kewangan dan Perakaunan (Finance & Account).</li>
+                                        <li>Pentadbiran dan Sumber Manusia (Administration & HR).</li>
+                                        <li>Jualan (Sales).</li>
+                                        <li>Sistem dan Automasi (System).</li>
+                                    </ol>
+                                </div>
+                            </div>
+
+<!-- 9.2 Bimbingan Berkumpulan -->
+                            <div class="bg-white p-5 rounded-2xl border border-[#e2d9c5] shadow-sm space-y-3">
+                                <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                    <span class="font-bold text-teal-800 text-sm">9.2 Bimbingan Berkumpulan</span>
+                                    <i class="fa-solid fa-users-rectangle text-teal-600"></i>
+                                </div>
+                                <p class="text-slate-700 font-serif text-[11px] leading-relaxed">
+                                    Setiap peserta diwajibkan mengikuti sekurang-kurangnya empat (4) sesi bimbingan berkumpulan, dengan minimum dua (2) sesi dilaksanakan secara bersemuka.
+                                </p>
+                                <p class="text-slate-600 font-serif text-[11px] leading-relaxed">
+                                    Sesi ini menggunakan pendekatan berfasa dan progresif bagi membolehkan peserta berkongsi pengalaman, membincangkan cabaran serta mendapatkan penyelesaian secara bersama.
+                                </p>
+                            </div>
+                        </div>
+
+<!-- 9.3 Sistem Sokongan Bimbingan & 9.4 Sesi Interaktif -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 font-sans text-xs">
+                            <div class="bg-white p-5 rounded-2xl border border-[#e2d9c5] shadow-sm space-y-3">
+                                <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                    <span class="font-bold text-teal-800 text-sm">9.3 Sistem Sokongan Bimbingan</span>
+                                    <i class="fa-solid fa-hands-holding-child text-teal-600"></i>
+                                </div>
+                                <p class="text-slate-700 font-serif text-[11px]">Setiap kumpulan yang terdiri daripada lima (5) orang peserta akan diberikan sokongan bimbingan melalui:</p>
+                                <ul class="list-disc list-inside space-y-1.5 text-slate-600">
+                                    <li><strong>Coach Tetap:</strong> Membimbing peserta dalam merangka dan melaksanakan strategi perniagaan jangka pendek serta jangka panjang.</li>
+                                    <li><strong>Pakar Bidang (SME):</strong> Memberikan pandangan teknikal, penyelesaian khusus dan amalan terbaik mengikut bidang.</li>
+                                    <li><strong>Usahawan Berpengalaman:</strong> Berkongsi pengalaman sebenar, cabaran dan strategi kejayaan dalam sektor berkaitan.</li>
+                                    <li><strong>Life Coach:</strong> Memberikan sokongan pembangunan sahsiah, kesejahteraan emosi, motivasi dan keseimbangan kehidupan.</li>
+                                </ul>
+                            </div>
+
+<div class="bg-white p-5 rounded-2xl border border-[#e2d9c5] shadow-sm space-y-3">
+                                <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                    <span class="font-bold text-teal-800 text-sm">9.4 Sesi Interaktif & Perkongsian Ilmu</span>
+                                    <i class="fa-solid fa-comments text-teal-600"></i>
+                                </div>
+                                <p class="text-slate-700 font-serif text-[11px]">Peserta turut berpeluang mengikuti sesi perkongsian ilmu secara santai, sama ada secara bersemuka atau dalam talian.</p>
+                                <div>
+                                    <strong class="text-slate-900 block mb-1 uppercase text-[10px] tracking-wider text-teal-700">Topik Dicadangkan:</strong>
+                                    <ul class="list-disc list-inside space-y-1 text-slate-600">
+                                        <li>Pelaksanaan e-Invois.</li>
+                                        <li>Strategi pemasaran TikTok.</li>
+                                        <li>Teknik pemasaran WhatsApp.</li>
+                                        <li>Penggunaan teknologi dan kecerdasan buatan (AI).</li>
+                                        <li>Pendigitalan pengurusan perniagaan.</li>
+                                        <li>Strategi meningkatkan jualan dan pelanggan.</li>
+                                        <li>Isu semasa berkaitan pengurusan PMKS.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+</div>
+
+<div class="bg-teal-50 border border-teal-200 p-4 rounded-xl text-center font-serif text-xs text-teal-900">
+                        <i class="fa-solid fa-circle-info mr-1 text-teal-700"></i> Latihan ini bukan sahaja memberikan pengetahuan teori, malah turut menekankan aplikasi praktikal melalui kajian kes, latihan interaktif, perbincangan kumpulan dan sesi bimbingan.
+                    </div>
+                </div>
+
+<!-- NEW SECTION: PENILAIAN PRESTASI USAHAWAN (SECTION 10.0) -->
+                <div id="section-kpi" class="space-y-6 pt-8 border-t border-[#e2d9c5] scroll-mt-6">
+                    <div class="border-l-4 border-teal-700 pl-4">
+                        <h3 class="font-serif font-bold text-lg sm:text-xl text-slate-900">10.0 PENILAIAN PRESTASI USAHAWAN</h3>
+                        <p class="text-xs text-slate-600 font-serif">Penilaian prestasi dilaksanakan bagi mengukur tahap perkembangan dan keberkesanan pelaksanaan strategi transformasi perniagaan sepanjang tempoh program.</p>
+                    </div>
+
+<div class="bg-white p-6 rounded-2xl border border-[#e2d9c5] shadow-sm space-y-4 font-serif text-sm text-slate-700 leading-relaxed">
+                        <p>
+                            Penilaian prestasi dilaksanakan bagi mengukur tahap perkembangan dan keberkesanan pelaksanaan strategi transformasi perniagaan sepanjang tempoh program.
+                        </p>
+                        <p>
+                            Setiap peserta dikehendaki memilih enam (6) bidang keberhasilan utama (Key Result Areas – KRA) dan dua belas (12) petunjuk prestasi utama (Key Performance Indicators – KPI) yang bersesuaian dengan keperluan perniagaan masing-masing.
+                        </p>
+                        <p class="bg-amber-50 border border-amber-200 p-3 rounded-xl text-xs font-sans text-amber-900">
+                            <i class="fa-solid fa-triangle-exclamation mr-1 text-amber-700"></i> <strong>Nota Penting:</strong> KPI peningkatan jualan merupakan petunjuk wajib bagi semua peserta.
+                        </p>
+
+<div class="pt-2">
+                            <h4 class="font-bold text-slate-900 font-sans text-xs uppercase tracking-wider text-teal-800 mb-3">10.1 Bidang Penilaian KRA dan KPI</h4>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-sans text-xs">
+                                <!-- A. Pemasaran -->
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                                    <div class="font-bold text-teal-800 text-sm border-b border-slate-200 pb-1.5 flex items-center justify-between">
+                                        <span>A. Pemasaran (Marketing)</span>
+                                        <i class="fa-solid fa-bullhorn text-teal-600"></i>
+                                    </div>
+                                    <ul class="list-disc list-inside space-y-1 text-slate-700">
+                                        <li>Jumlah aktiviti tanggungjawab sosial korporat (CSR).</li>
+                                        <li>Jumlah perbelanjaan dan keberkesanan pengiklanan serta promosi.</li>
+                                        <li>Tahap publisiti dan liputan media.</li>
+                                        <li>Jumlah serta keberkesanan saluran jualan dan pengedaran.</li>
+                                        <li>Prestasi platform jualan dalam talian dan luar talian.</li>
+                                    </ul>
+                                </div>
+
+<!-- B. Operasi -->
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                                    <div class="font-bold text-teal-800 text-sm border-b border-slate-200 pb-1.5 flex items-center justify-between">
+                                        <span>B. Operasi (Operation)</span>
+                                        <i class="fa-solid fa-gears text-teal-600"></i>
+                                    </div>
+                                    <ul class="list-disc list-inside space-y-1 text-slate-700">
+                                        <li>Pembangunan dan pematuhan SOP.</li>
+                                        <li>Penambahbaikan produk untuk meningkatkan kualiti & daya saing.</li>
+                                        <li>Penambahbaikan proses kerja.</li>
+                                        <li>Pelaksanaan tanda aras produk.</li>
+                                        <li>Penambahan peralatan untuk meningkatkan kapasiti operasi.</li>
+                                    </ul>
+                                </div>
+
+<!-- C. Kewangan -->
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                                    <div class="font-bold text-teal-800 text-sm border-b border-slate-200 pb-1.5 flex items-center justify-between">
+                                        <span>C. Kewangan & Perakaunan</span>
+                                        <i class="fa-solid fa-coins text-teal-600"></i>
+                                    </div>
+                                    <ul class="list-disc list-inside space-y-1 text-slate-700">
+                                        <li>Purata keuntungan kasar bulanan dan tahunan.</li>
+                                        <li>Purata keuntungan bersih selepas perbelanjaan.</li>
+                                        <li>Rekod aliran tunai yang teratur.</li>
+                                        <li>Penyediaan penyata untung rugi yang tepat dan terkini.</li>
+                                        <li>Pengiraan kos operasi, pemasaran dan pengeluaran.</li>
+                                    </ul>
+                                </div>
+
+<!-- D. Pentadbiran & HR -->
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                                    <div class="font-bold text-teal-800 text-sm border-b border-slate-200 pb-1.5 flex items-center justify-between">
+                                        <span>D. Pentadbiran & Sumber Manusia</span>
+                                        <i class="fa-solid fa-user-tie text-teal-600"></i>
+                                    </div>
+                                    <ul class="list-disc list-inside space-y-1 text-slate-700">
+                                        <li>Penambahan tenaga kerja mengikut keperluan organisasi.</li>
+                                        <li>Jumlah hari latihan pekerja.</li>
+                                        <li>Bilangan sesi bimbingan yang dihadiri pekerja.</li>
+                                        <li>Penglibatan dalam mesyuarat dan perbincangan organisasi.</li>
+                                        <li>Penyediaan dan pematuhan deskripsi kerja (Job Description – JD).</li>
+                                    </ul>
+                                </div>
+
+<!-- E. Jualan -->
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                                    <div class="font-bold text-teal-800 text-sm border-b border-slate-200 pb-1.5 flex items-center justify-between">
+                                        <span>E. Jualan (Sales)</span>
+                                        <i class="fa-solid fa-chart-line text-teal-600"></i>
+                                    </div>
+                                    <ul class="list-disc list-inside space-y-1 text-slate-700">
+                                        <li>Jumlah hasil jualan bulanan.</li>
+                                        <li>Bilangan pelanggan baharu kategori B2C.</li>
+                                        <li>Bilangan pelanggan baharu kategori B2B.</li>
+                                        <li>Purata nilai pembelian pelanggan (Basket Size).</li>
+                                        <li>Jumlah unit penyimpanan stok (SKU) atau perkhidmatan.</li>
+                                    </ul>
+                                </div>
+
+<!-- F. Sistem & Automasi -->
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                                    <div class="font-bold text-teal-800 text-sm border-b border-slate-200 pb-1.5 flex items-center justify-between">
+                                        <span>F. Sistem dan Automasi (System)</span>
+                                        <i class="fa-solid fa-laptop-code text-teal-600"></i>
+                                    </div>
+                                    <ul class="list-disc list-inside space-y-1 text-slate-700">
+                                        <li>Pelaksanaan sistem pengurusan perniagaan.</li>
+                                        <li>Sistem pengurusan jualan.</li>
+                                        <li>Sistem kewangan dan perakaunan.</li>
+                                        <li>Sistem operasi dan logistik.</li>
+                                        <li>Sistem sumber manusia, automasi & penskalaan perniagaan.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+<!-- NEW SECTION: LAWATAN PEMANTAUAN (SECTION 11.0) & LAPORAN AKHIR (12.0) -->
+                <div id="section-laporan" class="space-y-6 pt-8 border-t border-[#e2d9c5] scroll-mt-6">
+                    <div class="border-l-4 border-teal-700 pl-4">
+                        <h3 class="font-serif font-bold text-lg sm:text-xl text-slate-900">11.0 & 12.0 LAWATAN PEMANTAUAN & LAPORAN AKHIR</h3>
+                        <p class="text-xs text-slate-600 font-serif">Mekanisme pemantauan berterusan serta bentuk penyediaan laporan akhir bertulis dan dashboard grafik.</p>
+                    </div>
+
+<div class="bg-white p-6 rounded-2xl border border-[#e2d9c5] shadow-sm space-y-6 font-serif text-sm text-slate-700 leading-relaxed">
+
+<!-- Section 11.0 -->
+                        <div class="space-y-3">
+                            <h4 class="font-bold text-slate-900 font-sans text-xs uppercase tracking-wider text-teal-800">11.0 Lawatan Pemantauan</h4>
+                            <p>
+                                Bagi memastikan keberkesanan pelaksanaan program, sekurang-kurangnya dua (2) sesi lawatan pemantauan akan dilaksanakan ke premis setiap peserta. Lawatan ini bertujuan memberikan bimbingan secara langsung, menilai perkembangan perniagaan serta mengenal pasti cabaran yang memerlukan intervensi tambahan.
+                            </p>
+
+<div class="pt-2">
+                                <h5 class="font-bold text-slate-900 font-sans text-xs uppercase tracking-wider text-teal-700 mb-2">11.1 Mekanisme Pemantauan</h5>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 font-sans text-xs">
+                                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                                        <div class="font-bold text-teal-800">A. Laporan Kemajuan Bulanan</div>
+                                        <p class="text-slate-600 text-[11px]">Peserta mengemukakan laporan merangkumi jualan, operasi, pemasaran, KPI, pelan transformasi dan cabaran isu dihadapi.</p>
+                                    </div>
+                                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                                        <div class="font-bold text-teal-800">B. Lawatan Coach & Pakar</div>
+                                        <p class="text-slate-600 text-[11px]">Penilaian langsung merangkumi semua komponen M.O.F.A.S.S oleh coach dan pakar industri.</p>
+                                    </div>
+                                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                                        <div class="font-bold text-teal-800">C. Kaji Selidik Pra & Pasca</div>
+                                        <p class="text-slate-600 text-[11px]">Menilai perubahan dan impak program terhadap prestasi perniagaan dan peningkatan jualan.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+<!-- Section 12.0 -->
+                        <div class="space-y-4 pt-4 border-t border-slate-200">
+                            <h4 class="font-bold text-slate-900 font-sans text-xs uppercase tracking-wider text-teal-800">12.0 Penyediaan Laporan Akhir</h4>
+                            <p>
+                                Laporan akhir program akan disediakan dalam dua (2) bentuk utama, iaitu laporan bertulis dan laporan grafik atau dashboard.
+                            </p>
+
+<div class="space-y-3 font-sans text-xs">
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                                    <div class="font-bold text-teal-800 text-sm">12.1 Laporan Bertulis</div>
+                                    <ul class="list-disc list-inside space-y-1 text-slate-700">
+                                        <li><strong>Analisis Demografi Peserta:</strong> Pecahan mengikut umur, jantina, latar belakang, lokasi dan industri.</li>
+                                        <li><strong>Penilaian Maklum Balas:</strong> Tahap kepuasan modul latihan, coaching dan cadangan penambahbaikan.</li>
+                                        <li><strong>Penilaian Pra & Pasca:</strong> Perbandingan kemahiran, kewangan, pengurusan dan operasi.</li>
+                                        <li><strong>Pencapaian & Kisah Kejayaan:</strong> Senarai syarikat meningkat, peningkatan jualan, keuntungan dan kajian kes.</li>
+                                    </ul>
+                                </div>
+
+<div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                                    <div class="font-bold text-teal-800 text-sm">12.2 Laporan Grafik dan Dashboard</div>
+                                    <p class="text-slate-600 text-[11px]">Dashboard akan memaparkan analisis prestasi peserta berdasarkan lapan (8) aspek utama:</p>
+                                    <ol class="list-decimal list-inside space-y-1 text-slate-700">
+                                        <li>Pengurusan Operasi: Tahap pematuhan SOP dan kecekapan operasi.</li>
+                                        <li>Strategi Pemasaran: Keberkesanan pemasaran digital dan konvensional.</li>
+                                        <li>Jualan dan Pendapatan: Perubahan hasil jualan dan keuntungan.</li>
+                                        <li>Pengurusan Kewangan: Pengurusan aliran tunai, kos operasi dan margin keuntungan.</li>
+                                        <li>Teknologi dan Automasi: Tahap pendigitalan operasi.</li>
+                                        <li>Pembangunan Produk dan Inovasi: Penambahbaikan produk dan perkhidmatan.</li>
+                                        <li>Kepimpinan dan Sumber Manusia: Kecekapan pengurusan tenaga kerja.</li>
+                                        <li>Kesediaan Skalabiliti: Potensi syarikat berkembang ke tahap lebih tinggi.</li>
+                                    </ol>
+                                    <p class="text-[11px] text-slate-600 italic pt-1">Dashboard turut merangkumi laporan status isu dan permasalahan mengenal pasti cabaran utama peserta serta cadangan penyelesaian.</p>
+                                </div>
+                            </div>
+                        </div>
+
+</div>
+                </div>
+
+</div>
+
+<!-- BAB 4: IMPAK G.E.T.S & KEWANGAN -->
+            <div id="section-gets" class="space-y-6 pt-8 border-t-2 border-[#e2d9c5] scroll-mt-6">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl sm:text-2xl font-serif font-bold text-slate-900 flex items-center gap-3">
+                        <span class="w-8 h-8 rounded bg-teal-800 text-white text-sm flex items-center justify-center font-sans">04</span> 
+                        Impak G.E.T.S & Anggaran Perbelanjaan
+                    </h2>
+                </div>
+
+<!-- NEW: 13.0 HASIL DAN IMPAK PROGRAM -->
+                <div class="space-y-4">
+                    <div class="border-l-4 border-teal-700 pl-4">
+                        <h3 class="font-serif font-bold text-xl text-slate-900">13.0 HASIL DAN IMPAK PROGRAM</h3>
+                        <p class="text-xs text-slate-600 font-serif">Pelaksanaan Program BIZ TRUST dijangka menghasilkan empat (4) impak utama yang diringkaskan melalui kerangka G.E.T.S.</p>
+                    </div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 font-sans text-xs pt-2">
+                        <!-- 13.1 G - Growth -->
+                        <div class="bg-gradient-to-br from-slate-900 to-teal-950 text-white p-6 rounded-3xl shadow-xl space-y-4 border border-teal-500/30">
+                            <div class="flex items-center justify-between">
+                                <div class="w-12 h-12 rounded-2xl bg-teal-500/20 border border-teal-500/40 flex items-center justify-center text-teal-400 text-xl">
+                                    <i class="fa-solid fa-chart-line-up"></i>
+                                </div>
+                                <span class="text-xs font-bold px-3 py-1 bg-teal-500/20 text-teal-300 rounded-full uppercase tracking-wider">13.1 G - Growth</span>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-serif font-bold text-teal-300">Growth (Pertumbuhan Perniagaan)</h3>
+                                <p class="text-xs text-slate-300 mt-2 leading-relaxed font-serif">
+                                    Program ini dijangka mempercepatkan pertumbuhan syarikat melalui pelaksanaan pelan transformasi, peningkatan kapasiti pengeluaran, penembusan pasaran baharu serta penggunaan teknologi digital.
+                                </p>
+                            </div>
+                            <div class="pt-3 border-t border-white/10 space-y-1.5 text-xs text-slate-300">
+                                <strong class="text-teal-200 block text-[10px] uppercase tracking-wider">Petunjuk Impak:</strong>
+                                <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-teal-400"></i> Peningkatan saiz operasi.</div>
+                                <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-teal-400"></i> Penambahan produk atau perkhidmatan.</div>
+                                <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-teal-400"></i> Pembukaan cawangan baharu.</div>
+                                <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-teal-400"></i> Kemasukan ke pasaran baharu.</div>
+                            </div>
+                        </div>
+
+<!-- 13.2 E - Employment -->
+                        <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white p-6 rounded-3xl shadow-xl space-y-4 border border-blue-500/30">
+                            <div class="flex items-center justify-between">
+                                <div class="w-12 h-12 rounded-2xl bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-blue-400 text-xl">
+                                    <i class="fa-solid fa-users-gear"></i>
+                                </div>
+                                <span class="text-xs font-bold px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full uppercase tracking-wider">13.2 E - Employment</span>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-serif font-bold text-blue-300">Employment (Peluang Pekerjaan)</h3>
+                                <p class="text-xs text-slate-300 mt-2 leading-relaxed font-serif">
+                                    Pengembangan perniagaan dijangka mewujudkan peluang pekerjaan baharu serta meningkatkan keperluan terhadap tenaga kerja berkemahiran.
+                                </p>
+                            </div>
+                            <div class="pt-3 border-t border-white/10 space-y-1.5 text-xs text-slate-300">
+                                <strong class="text-blue-200 block text-[10px] uppercase tracking-wider">Petunjuk Impak:</strong>
+                                <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-blue-400"></i> Pertambahan pekerja tetap atau kontrak.</div>
+                                <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-blue-400"></i> Pengambilan tenaga kerja tempatan.</div>
+                                <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-blue-400"></i> Peningkatan peluang latihan & pembangunan kakitangan.</div>
+                            </div>
+                        </div>
+
+<!-- 13.3 T - Turnover -->
+                        <div class="bg-gradient-to-br from-slate-900 to-amber-950 text-white p-6 rounded-3xl shadow-xl space-y-4 border border-amber-500/30">
+                            <div class="flex items-center justify-between">
+                                <div class="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 text-xl">
+                                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                                </div>
+                                <span class="text-xs font-bold px-3 py-1 bg-amber-500/20 text-amber-300 rounded-full uppercase tracking-wider">13.3 T - Turnover</span>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-serif font-bold text-amber-300">Turnover (Pendapatan & Kewangan)</h3>
+                                <p class="text-xs text-slate-300 mt-2 leading-relaxed font-serif">
+                                    Melalui peningkatan kecekapan operasi dan strategi pemasaran yang lebih efektif, syarikat dijangka mencatat pertumbuhan hasil jualan dan keuntungan.
+                                </p>
+                            </div>
+                            <div class="pt-3 border-t border-white/10 space-y-1.5 text-xs text-slate-300">
+                                <strong class="text-amber-200 block text-[10px] uppercase tracking-wider">Petunjuk Impak:</strong>
+                                <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-amber-400"></i> Peningkatan peratusan hasil jualan tahunan.</div>
+                                <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-amber-400"></i> Kepelbagaian saluran pendapatan.</div>
+                                <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-amber-400"></i> Peningkatan margin keuntungan.</div>
+                                <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-amber-400"></i> Penambahbaikan pengurusan aliran tunai.</div>
+                            </div>
+                        </div>
+
+<!-- 13.4 S - Sustainability -->
+                        <div class="bg-gradient-to-br from-slate-900 to-emerald-950 text-white p-6 rounded-3xl shadow-xl space-y-4 border border-emerald-500/30">
+                            <div class="flex items-center justify-between">
+                                <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 text-xl">
+                                    <i class="fa-solid fa-seedling"></i>
+                                </div>
+                                <span class="text-xs font-bold px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-full uppercase tracking-wider">13.4 S - Sustainability</span>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-serif font-bold text-emerald-300">Sustainability (Kelestarian Perniagaan)</h3>
+                                <p class="text-xs text-slate-300 mt-2 leading-relaxed font-serif">
+                                    Program ini menekankan pembinaan perniagaan yang mampu bertahan dalam jangka panjang, bukan sahaja dari sudut kewangan dan operasi, malah daripada aspek kepimpinan dan kesinambungan organisasi.
+                                </p>
+                            </div>
+                            <div class="pt-3 border-t border-white/10 space-y-1.5 text-xs text-slate-300">
+                                <strong class="text-emerald-200 block text-[10px] uppercase tracking-wider">Petunjuk Impak:</strong>
+                                <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-400"></i> Pelaksanaan amalan tadbir urus yang baik.</div>
+                                <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-400"></i> Pengukuhan sistem dan prosedur operasi.</div>
+                                <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-400"></i> Penyediaan pelan penggantian kepimpinan (succession plan).</div>
+                                <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-400"></i> Pembangunan bakat generasi penerus.</div>
+                                <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-400"></i> Keupayaan menyesuaikan diri dengan pasaran & teknologi.</div>
+                                <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-400"></i> Ketahanan menghadapi krisis dan cabaran ekonomi.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+<!-- NEW SECTION: NILAI TAMBAH PROGRAM (SECTION 14.0) -->
+                <div class="space-y-6 pt-8 border-t border-[#e2d9c5] mt-8">
+                    <div class="border-l-4 border-teal-700 pl-4">
+                        <h3 class="font-serif font-bold text-xl text-slate-900">14.0 NILAI TAMBAH PROGRAM</h3>
+                        <p class="text-xs text-slate-600 font-serif">Bagi meningkatkan keberkesanan pelaksanaan program, beberapa komponen nilai tambah turut disediakan.</p>
+                    </div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 font-sans text-xs">
+                        <!-- 14.1 Sistem Bimbingan Berstruktur -->
+                        <div class="bg-white p-5 rounded-2xl border border-[#e2d9c5] shadow-sm space-y-2">
+                            <div class="font-bold text-teal-800 text-sm flex items-center gap-2 border-b border-slate-100 pb-2">
+                                <i class="fa-solid fa-people-group text-teal-600"></i> 14.1 Sistem Bimbingan Berstruktur
+                            </div>
+                            <p class="text-slate-600 text-[11px]">Setiap kumpulan peserta akan menerima sokongan daripada:</p>
+                            <ul class="list-disc list-inside space-y-1 text-slate-600">
+                                <li>Coach tetap.</li>
+                                <li>Pakar bidang (Subject Matter Expert).</li>
+                                <li>Usahawan berpengalaman sektor berkaitan.</li>
+                                <li>Life Coach sokongan pembangunan kendiri.</li>
+                            </ul>
+                        </div>
+
+<!-- 14.2 Sesi Sembang Santai -->
+                        <div class="bg-white p-5 rounded-2xl border border-[#e2d9c5] shadow-sm space-y-2">
+                            <div class="font-bold text-teal-800 text-sm flex items-center gap-2 border-b border-slate-100 pb-2">
+                                <i class="fa-solid fa-mug-hot text-teal-600"></i> 14.2 Sembang Santai & Ilmu
+                            </div>
+                            <p class="text-slate-600 text-[11px]">Sesi perkongsian ilmu dilaksanakan secara bersemuka atau dalam talian:</p>
+                            <ul class="list-disc list-inside space-y-1 text-slate-600">
+                                <li>E-Invois & pendigitalan perniagaan.</li>
+                                <li>Pemasaran TikTok & digital.</li>
+                                <li>Teknik pemasaran WhatsApp.</li>
+                                <li>Penggunaan AI dalam perniagaan.</li>
+                                <li>Automasi, produktiviti & pasaran.</li>
+                            </ul>
+                        </div>
+
+<!-- 14.3 Analisis Psikometrik -->
+                        <div class="bg-white p-5 rounded-2xl border border-[#e2d9c5] shadow-sm space-y-2">
+                            <div class="font-bold text-teal-800 text-sm flex items-center gap-2 border-b border-slate-100 pb-2">
+                                <i class="fa-solid fa-brain text-teal-600"></i> 14.3 Analisis Psikometrik
+                            </div>
+                            <p class="text-slate-700 font-serif text-[11px] leading-relaxed">
+                                Peserta turut diberikan peluang mengikuti penilaian psikometrik bagi mengenal pasti kecenderungan personaliti, gaya komunikasi, kekuatan diri dan potensi pembangunan.
+                            </p>
+                            <p class="text-[11px] text-slate-500 italic">Setiap penilaian disertakan laporan & sijil pengesahan.</p>
+                        </div>
+
+<!-- 14.4 Fasilitasi & Mentoring Tambahan -->
+                        <div class="bg-white p-5 rounded-2xl border border-[#e2d9c5] shadow-sm space-y-2">
+                            <div class="font-bold text-teal-800 text-sm flex items-center gap-2 border-b border-slate-100 pb-2">
+                                <i class="fa-solid fa-clock-rotate-left text-teal-600"></i> 14.4 Mentoring Tambahan
+                            </div>
+                            <p class="text-slate-700 font-serif text-[11px] leading-relaxed">
+                                Program turut menyediakan fasilitasi dan mentoring tambahan selama <strong>tiga (3) bulan</strong> selepas tamat tempoh utama program tanpa bayaran tambahan.
+                            </p>
+                            <p class="text-[11px] text-slate-500 italic">Membantu peserta meneruskan pelaksanaan pelan transformasi.</p>
+                        </div>
+
+<!-- 14.5 Fasilitasi Geran & Bantuan Kewangan -->
+                        <div class="bg-white p-5 rounded-2xl border border-[#e2d9c5] shadow-sm space-y-2">
+                            <div class="font-bold text-teal-800 text-sm flex items-center gap-2 border-b border-slate-100 pb-2">
+                                <i class="fa-solid fa-hand-holding-dollar text-teal-600"></i> 14.5 Geran & Kewangan
+                            </div>
+                            <p class="text-slate-600 text-[11px] leading-relaxed">
+                                Peserta akan dibantu mengenal pasti peluang geran, insentif dan kemudahan pembiayaan bersesuaian, merangkumi panduan dokumen sokongan serta perlindungan harta intelek (cap dagangan, paten & hak cipta).
+                            </p>
+                        </div>
+
+<!-- 14.6 Akses Jaringan Perniagaan -->
+                        <div class="bg-white p-5 rounded-2xl border border-[#e2d9c5] shadow-sm space-y-2">
+                            <div class="font-bold text-teal-800 text-sm flex items-center gap-2 border-b border-slate-100 pb-2">
+                                <i class="fa-solid fa-globe text-teal-600"></i> 14.6 Jaringan Perniagaan
+                            </div>
+                            <p class="text-slate-600 text-[11px]">Pendedahan menyertai jaringan perniagaan tempatan & antarabangsa:</p>
+                            <ul class="list-disc list-inside space-y-1 text-slate-600">
+                                <li>Peluang kerjasama & pemadanan (business matching).</li>
+                                <li>Pasaran & pengedaran baharu.</li>
+                                <li>Hubungan bakal pelabur & rakan strategik.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+<!-- Budget & Chart Section -->
+                <div class="bg-white p-6 rounded-3xl border border-[#e2d9c5] mt-8 space-y-6">
+                    <div class="space-y-2">
+                        <span class="text-xs font-bold text-teal-800 bg-teal-50 px-3 py-1 rounded-full border border-teal-200 uppercase tracking-wider">Anggaran Kos</span>
+                        <h3 class="text-xl font-serif font-bold text-slate-900">16.0 Anggaran Perbelanjaan Program</h3>
+                        <p class="text-xs text-slate-600 font-serif leading-relaxed">
+                            Anggaran kos pelaksanaan adalah berdasarkan penyertaan seramai tiga puluh (30) orang peserta untuk tempoh enam (6) bulan.
+                        </p>
+                    </div>
+
+<!-- BUDGET TABLE -->
+                    <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                        <table class="w-full text-left border-collapse text-xs font-sans">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-800 border-b border-slate-200">
+                                    <th class="p-2.5 font-bold w-12 text-center">Bil.</th>
+                                    <th class="p-2.5 font-bold">Perkara</th>
+                                    <th class="p-2.5 font-bold text-right">Jumlah (RM)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 text-slate-700">
+                                <tr>
+                                    <td class="p-2.5 text-center font-medium">1</td>
+                                    <td class="p-2.5">Pendaftaran dan penyaringan peserta</td>
+                                    <td class="p-2.5 text-right font-medium">20,000</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2.5 text-center font-medium">2</td>
+                                    <td class="p-2.5">Pengurusan dan pentadbiran program</td>
+                                    <td class="p-2.5 text-right font-medium">96,000</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2.5 text-center font-medium">3</td>
+                                    <td class="p-2.5">Ujian personaliti dan penilaian kesediaan perniagaan</td>
+                                    <td class="p-2.5 text-right font-medium">15,000</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2.5 text-center font-medium">4</td>
+                                    <td class="p-2.5">Latihan keusahawanan (4H3M)</td>
+                                    <td class="p-2.5 text-right font-medium">48,000</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2.5 text-center font-medium">5</td>
+                                    <td class="p-2.5">Sesi coaching individu dan berkumpulan</td>
+                                    <td class="p-2.5 text-right font-medium">157,500</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2.5 text-center font-medium">6</td>
+                                    <td class="p-2.5">Lawatan pemantauan</td>
+                                    <td class="p-2.5 text-right font-medium">30,000</td>
+                                </tr>
+                                <tr class="bg-slate-50 font-semibold text-slate-900 border-t-2 border-slate-300">
+                                    <td colspan="2" class="p-2.5 text-right">Jumlah Kos</td>
+                                    <td class="p-2.5 text-right">366,500</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="p-2.5 text-right font-medium text-slate-600">SST (8%)</td>
+                                    <td class="p-2.5 text-right font-medium text-slate-600">29,320</td>
+                                </tr>
+                                <tr class="bg-teal-900 text-white font-bold">
+                                    <td colspan="2" class="p-3 text-right">JUMLAH KOS KESELURUHAN</td>
+                                    <td class="p-3 text-right text-amber-300">395,820</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+<div class="text-xs font-semibold text-slate-800 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                        Kos keseluruhan seorang peserta: <span class="text-teal-700 font-bold">RM13,194.00</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 italic">
+                        <strong>Nota:</strong> Anggaran kos tertakluk kepada skop akhir, pengesahan perkhidmatan dan keperluan pelaksanaan program.
+                    </p>
+                </div>
+
+<!-- NEW SECTION: 17.0 PENUTUP -->
+                <div class="space-y-4 pt-8 border-t border-[#e2d9c5] mt-8">
+                    <div class="border-l-4 border-teal-700 pl-4">
+                        <h3 class="font-serif font-bold text-xl text-slate-900">17.0 PENUTUP</h3>
+                        <p class="text-xs text-slate-600 font-serif">Kesimpulan dan rumusan pelaksanaan Program BIZ TRUST.</p>
+                    </div>
+
+<div class="bg-white p-6 rounded-3xl border border-[#e2d9c5] shadow-sm space-y-4 font-serif text-sm text-slate-700 leading-relaxed">
+                        <p>
+                            Program BIZ TRUST dirangka sebagai satu inisiatif pembangunan keusahawanan yang menyeluruh dan berorientasikan hasil, dengan matlamat membangunkan perusahaan yang lebih berdaya saing, mampan dan berimpak tinggi.
+                        </p>
+                        <p>
+                            Melalui gabungan latihan berstruktur, diagnostik perniagaan, bimbingan profesional, pemantauan prestasi serta sokongan jaringan strategik, program ini dijangka mampu membantu peserta melaksanakan transformasi sebenar dalam pengurusan dan operasi syarikat.
+                        </p>
+                        <p>
+                            Pendekatan yang digunakan bukan sekadar memberikan pendedahan ilmu keusahawanan, sebaliknya menekankan pelaksanaan tindakan yang boleh diukur melalui peningkatan jualan, produktiviti, kecekapan operasi, pengurusan kewangan dan keupayaan pengembangan perniagaan.
+                        </p>
+                        <p>
+                            Dalam jangka panjang, program ini diharapkan dapat melahirkan lebih ramai usahawan yang mempunyai struktur pengurusan profesional, sistem perniagaan yang kukuh serta keupayaan untuk bersaing dalam pasaran domestik dan antarabangsa.
+                        </p>
+                        <p class="bg-teal-50/75 p-4 rounded-2xl border border-teal-200 text-teal-900 text-xs font-sans font-medium">
+                            <i class="fa-solid fa-circle-check mr-1 text-teal-700"></i> Sehubungan itu, pelaksanaan Program BIZ TRUST diharapkan mendapat pertimbangan dan sokongan sewajarnya bagi merealisasikan agenda pembangunan perusahaan yang progresif, mampan dan berimpak tinggi kepada ekonomi negara.
+                        </p>
+                    </div>
+                </div>
+
+</div>
+
+</div>
+
+<!-- Book Footer -->
+        <footer class="bg-slate-900 text-slate-400 p-6 sm:p-8 text-center text-xs border-t border-[#e2d9c5]">
+            <p>© 2026 Program Biz Trust. Hak Cipta Terpelihara.</p>
+        </footer>
+
+</main>
+
+</div>
+
+<!-- JavaScript for Interactivity -->
+    <script>
+        function showNote(title, desc) {
+            const modal = document.getElementById('customModal');
+            const container = document.getElementById('modalContainer');
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalMessage').innerText = desc;
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                container.classList.remove('scale-95', 'opacity-0');
+                container.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('customModal');
+            const container = document.getElementById('modalContainer');
+            container.classList.remove('scale-100', 'opacity-100');
+            container.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
+        }
+
+        function toggleSidebar() {
+            const drawer = document.getElementById('sidebarDrawer');
+            if (drawer.classList.contains('hidden')) {
+                drawer.classList.remove('hidden');
+            } else {
+                drawer.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
